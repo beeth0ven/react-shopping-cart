@@ -10,8 +10,9 @@ class ProductList extends Component {
     const onSelect = this.props.onSelect;
     const productList = this.props.products.map(product => {
       return (
-        <div key={product.id} className="product-box">
+        <div key={product.id} className="product-display">
              <Product product={product}
+                      fromList={true}
                       onSelect={onSelect}
              />
         </div>
@@ -20,6 +21,7 @@ class ProductList extends Component {
 
     return (
       <div>
+        <h4>List of Products</h4>
         {productList}
       </div>
     );

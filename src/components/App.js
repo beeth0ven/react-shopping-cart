@@ -1,77 +1,118 @@
+
 import React, { Component } from 'react';
+import {
+  BrowserRouter as Router,
+  Route,
+  Switch
+} from 'react-router-dom';
+
+// import Header
+import Product from './Product';
 import ProductList from './ProductList';
 import ShoppingCart from './ShoppingCart';
-import lonelyBird from '../images/lonely-bird.jpg';
-import solidFriendship from '../images/solid-friendship.jpg';
+import NoMatch from './NoMatch';
+import Error from './Error';
 
-const products = [{
-  id: 1,
-  name: 'Lonely Bird',
-  image: lonelyBird,
-  price: 29.99,
-  isSelected: false
-}, {
-  id: 2,
-  name: 'Solid Friendship',
-  image: solidFriendship,
-  price: 19.99,
-  isSelected: false
-}];
+import Services from '../lib/services';
+import Header from "./Header";
 
 class App extends Component {
 
-  constructor() {
+  constructor(){
     super();
     this.state = {
-      products: products
+      products: [],
+      ready: false
     };
 
-    this.handleSelect = this.handleSelect.bind(this);
+    this.handelSelect = this.handelSelect.bind(this);
     this.handleDeselect = this.handleDeselect.bind(this);
+    this.handleSave = this.handleSave.bind(this);
+    this.handleCheckout = this.handleCheckout.bind(this);
   }
 
-  handleSelect(product) {
+  handelSelect(product) {
     const products = this.state.products.slice();
-
-    const index = products.map(p => p.id).indexOf(product.id);
-
+    const index = products.map(i => i.id).indexOf(product.id);
     products[index].isSelected = product.isSelected;
-
     this.setState({products: products});
   }
 
   handleDeselect(product) {
-    this.handleSelect(product);
+    this.handelSelect(product)
+  }
+
+  handleSave() {
+    console.log('App handleSave');
+  }
+
+  handleCheckout() {
+    console.log('App handleCheckout');
   }
 
   render() {
     return (
-      <div className="container">
-        <div className="row">
-          <div className="col-md-12">
-            <h1>Serverless Store</h1>
+      <Router>
+        <div className="container">
+          <div className="row">
+            <div className="col-md-12">
+              <Header/>
+            </div>
+          </div>
+          <div className="row">
+            <div className="col-md-12">
+              {
+                this.state.ready
+                  ?
+                    <Switch>
+                      <Route path="/" exact render={() =>
+                        <ProductList
+                          products={this.state.products}
+                          onSelect={this.handelSelect}
+                        />
+                      }/>
+                      <Route path="/product/:id" render={(props) =>
+                        <Product
+                          product={this.state.products.find(x => x.id === props.match.params.id)}
+                          onSelect={this.handelSelect}
+                        />
+                      }/>
+                      <Route path="/shopping-cart" render={() =>
+                        <ShoppingCart
+                          selectedProducts={this.state.products.find(p => p.isSelected)}
+                          onDeselect={this.handleDeselect}
+                          onSave={this.handleSave}
+                          onCheckout={this.handleCheckout}
+                        />
+                      }/>
+                      {/* Login Signup Stuff*/}
+
+                      <Route path="/error" cpmponent={Error}/>
+                      <Route components={NoMatch}/>
+                    </Switch>
+                  :
+                    <div>
+                      <span className="glyphicon glyphicon-refresh spin"></span>
+                    </div>
+              }
+            </div>
           </div>
         </div>
-        <div className="row">
-          <div className="col-md-8">
-            <h3>Products</h3>
-            <ProductList
-              products={this.state.products}
-              onSelect={this.handleSelect}
-            />
-          </div>
-          <div className="col-md-4">
-            <h3>Shopping Cart</h3>
-            <ShoppingCart
-              selectedProducts={this.state.products.filter(p => p.isSelected)}
-              onDeselect={this.handleDeselect}
-            />
-          </div>
-        </div>
-      </div>
+      </Router>
     );
   }
 
+  componentDidMount() {
+    Services.getProducts((err, res) => {
+      if (err)
+        console.error(err);
+      else
+        this.setState({
+          products: res.data.products,
+          ready: true
+        });
+    });
+  }
 }
 
 export default App;
