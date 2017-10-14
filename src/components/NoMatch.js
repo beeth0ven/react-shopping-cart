@@ -4,7 +4,7 @@
 
 import React, { Component } from 'react';
 
-class Navbar extends Component {
+class NoMatch extends Component {
   render() {
     return (
       <div className="panel-body">
@@ -14,4 +14,4 @@ class Navbar extends Component {
   }
 }
 
-export default Navbar;
+export default NoMatch;

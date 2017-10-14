@@ -22,4 +22,4 @@ class Comment extends Component {
   }
 }
 
-export default Component;
+export default Comment;

@@ -43,9 +43,17 @@ class Header extends Component {
               <NavItem>Shopping Cart</NavItem>
             </LinkContainer>
           </Nav>
-          {/*<Nav pullRight>*/}
-            {/**/}
-          {/*</Nav>*/}
+          <Nav pullRight>
+            <LinkContainer to="/signup">
+              <NavItem>Signup</NavItem>
+            </LinkContainer>
+            <LinkContainer to="/login">
+              <NavItem>Login</NavItem>
+            </LinkContainer>
+            <NavItem id="notification" onClick={() => this.openModal()}>
+              <span className="glyphicon glyphicon-bell"/>
+            </NavItem>
+          </Nav>
           <Modal show={this.state.showModal} onHide={this.closeModal}>
             <Modal.Header closeButton>
               <Modal.Title>Notifications</Modal.Title>

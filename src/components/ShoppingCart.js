@@ -3,7 +3,7 @@
  */
 
 import React, { Component } from 'react';
-import { Model } from 'react-router-bootstrap';
+import { Modal } from 'react-bootstrap';
 import ShoppingCartItem from './ShoppingCartItem'
 
 class ShoppingCart extends Component {

@@ -6,10 +6,11 @@ import {
   Switch
 } from 'react-router-dom';
 
-// import Header
 import Product from './Product';
 import ProductList from './ProductList';
 import ShoppingCart from './ShoppingCart';
+import Signup from "./Signup";
+import Login from "./Login";
 import NoMatch from './NoMatch';
 import Error from './Error';
 
@@ -79,20 +80,20 @@ class App extends Component {
                       }/>
                       <Route path="/shopping-cart" render={() =>
                         <ShoppingCart
-                          selectedProducts={this.state.products.find(p => p.isSelected)}
+                          selectedProducts={this.state.products.filter(p => p.isSelected)}
                           onDeselect={this.handleDeselect}
                           onSave={this.handleSave}
                           onCheckout={this.handleCheckout}
                         />
                       }/>
-                      {/* Login Signup Stuff*/}
-
-                      <Route path="/error" cpmponent={Error}/>
-                      <Route components={NoMatch}/>
+                      <Route path="/signup" component={Signup}/>
+                      <Route path="/login" component={Login}/>
+                      <Route path="/error" component={Error}/>
+                      <Route component={NoMatch}/>
                     </Switch>
                   :
                     <div>
-                      <span className="glyphicon glyphicon-refresh spin"></span>
+                      <span className="glyphicon glyphicon-refresh spin"/>
                     </div>
               }
             </div>

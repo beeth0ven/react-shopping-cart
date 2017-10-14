@@ -57,3 +57,25 @@
     float: right;
     cursor: pointer;
 }
+
+/* login */
+
+.login {
+    max-width: 480px;
+    margin: 0 auto;
+}
+
+.login button {
+    width: 100px;
+}
+
+/* signup */
+
+.signup {
+    max-width: 480px;
+    margin: 0 auto;
+}
+
+.signup button {
+    width: 100px;
+}
