@@ -8,12 +8,12 @@ import solidFriendship from '../images/solid-friendship.jpg';
 const comments = [{
   id: 1,
   username: "John Doe",
-  age: "3 days ago",
+  age: "3 days",
   text: "I'm using this to decorate my desk. I liked it."
 }, {
   id: 2,
   username: "Jane Smith",
-  age: "7 days ago",
+  age: "7 days",
   text: "This product was very well made."
 }];
 
