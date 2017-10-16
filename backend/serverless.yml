@@ -11,17 +11,17 @@ provider:
 functions:
   products:
     handler: functions/products.handler
-    event:
+    events:
       - http: GET products
       - http: PUT cart
       - http: OPTIONS cart
       - http: POST checkout
       - http: OPTIONS checkout
-    users:
-      handlers: functions/users.handler
-      events:
-        - http: GET users
-        - http: POST users
-        - http: PUT users
-        - http: DELETE users
-        - http: OPTIONS users
+  users:
+    handler: functions/users.handler
+    events:
+      - http: GET users
+      - http: POST users
+      - http: PUT users
+      - http: DELETE users
+      - http: OPTIONS users
