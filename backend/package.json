@@ -1,0 +1,8 @@
+{
+  "name": "serverless-store",
+  "version": "0.0.1",
+  "description": "Backend implementation of the Serverless Store.",
+  "author": "Luo Jie",
+  "license": "MIT"
+}
+
