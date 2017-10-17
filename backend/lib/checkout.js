@@ -2,8 +2,15 @@
  * Created by Air on 2017/10/16.
  */
 
-const db = require('../repositories/fakedb');
+import FakeDB from '../repositories/fakedb';
+const Util = require('./util');
+const DB = FakeDB;
 
-module.exports.processCheckout = (callback) => {
+class Checkout {
 
-};
+  static post(callback) {
+
+  }
+}
+
+export default Checkout;

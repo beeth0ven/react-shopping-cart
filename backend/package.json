@@ -3,6 +3,11 @@
   "version": "0.0.1",
   "description": "Backend implementation of the Serverless Store.",
   "author": "Luo Jie",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "aws-sdk": "^2.77.0"
+  },
+  "dependencies": {
+    "rx": "^4.1.0"
+  }
 }
-

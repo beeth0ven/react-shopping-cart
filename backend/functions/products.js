@@ -2,35 +2,34 @@
  * Created by Air on 2017/10/16.
  */
 
-const products = require('../lib/products');
-const checkout = require('../lib/checkout');
-const cart = require('../lib/cart');
-const utils = require('../lib/utils');
+import Product from '../lib/product'
+import Cart from '../lib/cart'
+import Checkout from '../lib/checkout'
+const Util = require('../lib/util');
 
 module.exports.handler = (event, context, callback) => {
 
   try {
     switch (`${event.httpMethod} ${event.resource}`) {
       case 'GET /products':
-        products.retrieveAll(callback);
+        Product.get(callback);
         break;
       case 'PUT /cart':
-        const id = JSON.parse(event.body).id;
-        cart.saveCart(id);
+        Cart.put(event, callback);
         break;
       case 'OPTIONS /cart':
-        utils.optionsHandler(callback);
+        callback(null, Util.optionsResponse());
         break;
       case 'POST /checkout':
-        checkout.processCheckout(callback);
+        Checkout.post(callback);
         break;
       case 'OPTIONS /checkout':
-        utils.optionsHandler(callback);
+        callback(null, Util.optionsResponse());
         break;
       default:
-        utils.notFoundHandler(callback);
+        callback(Util.notFoundResponse());
     }
   } catch (error) {
-      utils.errorHandler(error, callback);
+    callback(Util.internalErrorResponse(error));
   }
 };
