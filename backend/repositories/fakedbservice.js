@@ -4,7 +4,7 @@
 
 const Rx = require('rx');
 
-class FakeDB {
+class FakeDBService {
 
   static allProducts() {
 
@@ -40,4 +40,4 @@ class FakeDB {
   }
 }
 
-export default FakeDB;
+export default FakeDBService;
