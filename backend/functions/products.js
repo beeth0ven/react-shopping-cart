@@ -35,7 +35,7 @@ module.exports.handler = (event, context, callback) => {
         ProductsHandler.handleDefault(callback)
     }
   } catch (error) {
-    ProductsHandler.handleError(error);
+    ProductsHandler.handleError(error, callback);
   }
 };
 

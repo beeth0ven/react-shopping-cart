@@ -4,8 +4,9 @@
 
 const FakeDB = require('../repositories/fakedbservice');
 // import FakeDB from '../repositories/fakedbservice';
+const DynamoDBService = require('../repositories/dynamodbservice');
 const Util = require('./util');
-const DB = FakeDB;
+const DB = DynamoDBService;
 
 class Product {
 

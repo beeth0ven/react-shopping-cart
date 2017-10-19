@@ -16,7 +16,6 @@ class Util {
     }
   };
 
-
   static internalErrorResponse(error) {
     return {
       statusCode: 500,

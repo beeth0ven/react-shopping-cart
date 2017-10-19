@@ -6,5 +6,5 @@ const event = {
 };
 
 handler(event, null, (error, response) => {
-  error ? console.log(error) : console.log(response);
+  error ? console.error(error) : console.log(response);
 });
