@@ -2,8 +2,8 @@
  * Created by Air on 2017/10/16.
  */
 
-
-import FakeDB from '../repositories/fakedbservice';
+const FakeDB = require('../repositories/fakedbservice');
+// import FakeDB from '../repositories/fakedbservice';
 const Util = require('./util');
 const DB = FakeDB;
 
@@ -19,4 +19,5 @@ class Cart {
   }
 }
 
-export default Cart;
+module.exports = Cart;
+// export default Cart;

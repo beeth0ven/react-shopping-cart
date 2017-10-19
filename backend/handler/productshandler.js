@@ -11,4 +11,5 @@ class ProductsHandler {
   }
 }
 
-export default ProductsHandler;
+module.exports = ProductsHandler;
+// export default ProductsHandler;

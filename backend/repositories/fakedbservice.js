@@ -40,4 +40,5 @@ class FakeDBService {
   }
 }
 
-export default FakeDBService;
+module.exports = FakeDBService;
+// export default FakeDBService;

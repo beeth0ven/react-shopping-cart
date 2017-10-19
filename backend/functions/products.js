@@ -2,10 +2,15 @@
  * Created by Air on 2017/10/16.
  */
 
-import Product from '../lib/product';
-import Cart from '../lib/cart';
-import Checkout from '../lib/checkout';
-import ProductsHandler from '../handler/productshandler';
+const Product = require('../lib/product');
+const Cart = require('../lib/cart');
+const Checkout = require('../lib/checkout');
+const ProductsHandler = require('../handler/productshandler');
+
+// import Product from '../lib/product';
+// import Cart from '../lib/cart';
+// import Checkout from '../lib/checkout';
+// import ProductsHandler from '../handler/productshandler';
 
 module.exports.handler = (event, context, callback) => {
 

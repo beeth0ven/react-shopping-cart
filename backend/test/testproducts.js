@@ -1,4 +1,4 @@
-const handler = require('../functions/products');
+const handler = require('../functions/products').handler;
 
 const event = {
   httpMethod: 'GET',

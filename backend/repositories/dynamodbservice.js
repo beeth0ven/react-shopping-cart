@@ -19,4 +19,5 @@ class DynamoDBService {
   }
 }
 
-export default DynamoDBService;
+module.exports = DynamoDBService;
+// export default DynamoDBService;

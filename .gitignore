@@ -85,4 +85,4 @@ fabric.properties
 # End of https://www.gitignore.io/api/webstorm
 .idea/vcs.xml
 
-.serverless
+backend/.serverless/
