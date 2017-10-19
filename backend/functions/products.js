@@ -2,10 +2,10 @@
  * Created by Air on 2017/10/16.
  */
 
-import Product from '../lib/product'
-import Cart from '../lib/cart'
-import Checkout from '../lib/checkout'
-const Util = require('../lib/util');
+import Product from '../lib/product';
+import Cart from '../lib/cart';
+import Checkout from '../lib/checkout';
+import ProductsHandler from '../handler/productshandler';
 
 module.exports.handler = (event, context, callback) => {
 
@@ -18,18 +18,19 @@ module.exports.handler = (event, context, callback) => {
         Cart.put(event, callback);
         break;
       case 'OPTIONS /cart':
-        callback(null, Util.optionsResponse());
+        Cart.options(callback);
         break;
       case 'POST /checkout':
         Checkout.post(callback);
         break;
       case 'OPTIONS /checkout':
-        callback(null, Util.optionsResponse());
+        Checkout.options(callback);
         break;
       default:
-        callback(Util.notFoundResponse());
+        ProductsHandler.handleDefault(callback)
     }
   } catch (error) {
-    callback(Util.internalErrorResponse(error));
+    ProductsHandler.handleError(error);
   }
 };
+

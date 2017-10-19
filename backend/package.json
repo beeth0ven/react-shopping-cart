@@ -5,7 +5,8 @@
   "author": "Luo Jie",
   "license": "MIT",
   "devDependencies": {
-    "aws-sdk": "^2.77.0"
+    "aws-sdk": "^2.77.0",
+    "babel-preset-es2015": "^6.24.1"
   },
   "dependencies": {
     "rx": "^4.1.0"

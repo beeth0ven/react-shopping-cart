@@ -11,6 +11,10 @@ class Checkout {
   static post(callback) {
 
   }
+
+  static options(callback) {
+    callback(null, Util.optionsResponse());
+  }
 }
 
 export default Checkout;

@@ -11,17 +11,10 @@ class DynamoDBService {
   static allProducts() {
 
     return Rx.Observable.create(observer => {
-
       const params = { TableName: 'Product' };
-
-      const request = DocumentClient.scan(params, (error, date) => {
-        if (error) observer.onError(error);
-        else if (date.Items) {
-
-        }
-        else observer.onNext([]);
+      const request = DocumentClient.scan(params, (error, data) => {
+        error ? observer.onError(error) : observer.onNext(data.Items || []);
       });
-      return request.abort.bind(request);
     })
   }
 }
