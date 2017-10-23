@@ -2,45 +2,70 @@
  * Created by Air on 2017/10/13.
  */
 
-import lonelyBird from '../images/lonely-bird.jpg';
-import solidFriendship from '../images/solid-friendship.jpg';
-
-const comments = [{
-  id: 1,
-  username: "John Doe",
-  age: "3 days",
-  text: "I'm using this to decorate my desk. I liked it."
-}, {
-  id: 2,
-  username: "Jane Smith",
-  age: "7 days",
-  text: "This product was very well made."
-}];
-
-const products = [{
-  id: "lonely-bird",
-  name: "Lonely Bird",
-  image: lonelyBird,
-  price: 29.99,
-  isSelected: false,
-  comments: comments
-}, {
-  id: "solid-friendship",
-  name: "Solid Friendship",
-  image: solidFriendship,
-  price: 19.99,
-  isSelected: false,
-  comments: comments
-}];
+import axios from 'axios';
+import config from './config';
+import { Observable } from 'rx';
+import {
+  // AuthenticationDetails,
+  // CognitoUser,
+  CognitoUserAttribute,
+  CognitoUserPool
+} from 'amazon-cognito-identity-js';
 
 class Services {
 
-  static getProducts(callback) {
-    const res = {
-      data: { products: products }
-    };
-    setTimeout(() => { callback(null, res) }, 500);
+  static getProducts(userToken) {
+    let url = `${config.apiGateway.ADDRESS}/${config.apiGateway.STAGE}/${config.services.PRODUCTS}`;
+    if (userToken) url += 'Auth';
+    return this.axiosRequest('get', url, null);
   }
+
+  static signup(email, password, callback) {
+    const userPool = new CognitoUserPool({
+      UserPoolId: config.cognito.USER_POOL_ID,
+      ClientId: config.cognito.APP_CLIENT_ID
+    });
+
+    const attributeEmail = [
+      new CognitoUserAttribute({
+        Name: 'email',
+        Value: email
+      })
+    ];
+
+    // Observable.fromNodeCallback:
+    // https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/operators/fromnodecallback.md
+    const rxSignup = Observable.fromNodeCallback(userPool.signUp.bind(userPool));
+    return rxSignup(email, password, attributeEmail, null);
+  }
+
+  static confirmSignup(newUser, confirmationCode) {
+    const rxConfirmSignup = Observable.fromNodeCallback(newUser.confirmRegistration.bind(newUser));
+    return rxConfirmSignup(confirmationCode, true);
+  }
+
+  static axiosRequest(method, url, data, userToken) {
+    const config = {
+      method: method,
+      url: url
+    };
+
+    if (data || userToken) {
+      config.headers = {};
+
+      if (data) {
+        config.data = data;
+        config.headers["Content-Type"] = "application/json";
+      }
+
+      if (userToken) {
+        config.headers["Authorization"] = userToken;
+      }
+    }
+
+    return Observable.fromPromise(axios(config));
+  };
+
 }
 
 export default Services;

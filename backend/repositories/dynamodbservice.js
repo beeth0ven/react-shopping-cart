@@ -3,7 +3,6 @@
  */
 
 const AWS = require('aws-sdk');
-AWS.config.update({region:'ap-northeast-2'});
 const DocumentClient = new AWS.DynamoDB.DocumentClient();
 const Rx = require('rx');
 

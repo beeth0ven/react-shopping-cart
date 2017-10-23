@@ -104,15 +104,14 @@ class App extends Component {
   }
 
   componentDidMount() {
-    Services.getProducts((err, res) => {
-      if (err)
-        console.error(err);
-      else
-        this.setState({
-          products: res.data.products,
+
+    Services.getProducts()
+      .subscribe(res => this.setState({
+          products: res.data,
           ready: true
-        });
-    });
+        }),
+        error => console.error(error)
+      );
   }
 }
 

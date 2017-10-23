@@ -3,17 +3,17 @@ service: serverless-store
 provider:
   name: aws
   runtime: nodejs6.10
-    iamRoleStatements:
-      - Effect: "Allow"
-        Action:
-          - "dynamodb:Scan"
-          - "dynamodb:Query"
-          - "dynamodb:OutItem"
-          - "dynamodb:DeleteItem"
-          - "dynamodb:BatchWriteItem"
-        Resource: [
-          "arn:aws:dynamodb:ap-northeast-2:*:table/Product",
-        ]
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - "dynamodb:Scan"
+        - "dynamodb:Query"
+        - "dynamodb:OutItem"
+        - "dynamodb:DeleteItem"
+        - "dynamodb:BatchWriteItem"
+      Resource: [
+        "arn:aws:dynamodb:ap-northeast-2:*:table/Product",
+      ]
   stage: dev
   region: ap-northeast-2
   memorySize: 128
