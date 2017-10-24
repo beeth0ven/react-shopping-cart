@@ -5,6 +5,7 @@ import {
   Route,
   Switch
 } from 'react-router-dom';
+import { Observable } from 'rx'
 
 import Product from './Product';
 import ProductList from './ProductList';
@@ -86,45 +87,63 @@ class App extends Component {
 
   handleLogin = (email, password, history) => {
     console.log('handleLogin');
-    this.setState({ isLoadingSignin: true });
     Services.login(email, password)
       .flatMap(token =>
         Services.getProducts(token)
-          .map(result => ({
-            state: 'didGetProducts',
-            data: result.data
-          }))
-          .startWith({
-            state: 'didLogin',
-            data: token
-          })
+          .map(result => ({ state: 'onGetProducts', data: result.data }))
+          .startWith({ state: 'onLogin', data: token })
       )
-      .subscribe(result => {
-        switch (result.state) {
-          case 'didLogin':
-            console.log('Login success!', result);
-            this.setState({
-              isLoadingSignin: false,
-              userToken: result.data
-            });
-            history.push('/');
-            break;
-          case 'didGetProducts':
-            console.log('Get products success!', result);
-            this.setState({
-              products: result.data,
-              ready: true
-            });
-            break;
-          default:
-            console.log('Login default should not happen', result);
-            break;
-        }
-      }, error => {
-        console.log('Login failed error:', error);
-        this.setState({ isLoadingSignin: false });
-        alert(error);
-      })
+      .startWith({ state: 'onStartLogin' })
+      .catch(error => Observable.just({ state: 'onLoginError', data: error }))
+      .subscribe(result => { this.onLoginResult(result, history) })
+  };
+
+  onLoginResult = (result, history) => {
+    switch (result.state) {
+      case 'onStartLogin':
+        this.onStartLogin();
+        break;
+      case 'onLogin':
+        this.onLogin(result.data, history);
+        break;
+      case 'onGetProducts':
+        this.onGetProducts(result.data);
+        break;
+      case 'onLoginError':
+        this.onLoginError(result.data);
+        break;
+      default:
+        console.log('Login fatal error', result);
+        break;
+    }
+  };
+
+  onStartLogin = () => {
+    console.log('On Start Login');
+    this.setState({ isLoadingSignin: true });
+  };
+
+  onLogin = (userToken, history) => {
+    console.log('On Login');
+    this.setState({
+      isLoadingSignin: false,
+      userToken: userToken
+    });
+    history.push('/');
+  };
+
+  onGetProducts = (products) => {
+    console.log('On Get Products');
+    this.setState({
+      products: products,
+      ready: true
+    });
+  };
+
+  onLoginError = (error) => {
+    console.log('On Login Error:', error);
+    this.setState({ isLoadingSignin: false });
+    alert(error);
   };
 
   render() {
