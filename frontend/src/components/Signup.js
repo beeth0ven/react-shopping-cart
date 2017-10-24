@@ -10,8 +10,6 @@ import {
   HelpBlock
 } from 'react-bootstrap';
 
-import Services from '../lib/services';
-
 class Signup extends  Component {
 
   constructor(props) {
@@ -21,9 +19,9 @@ class Signup extends  Component {
       email: '',
       password: '',
       confirmPassword: '',
-      confirmationCode: '',
-      newUser: null,
-      isLoadingSignup: false
+      confirmationCode: ''
+      // newUser: null,
+      // isLoadingSignup: false
     };
 
   }
@@ -36,37 +34,13 @@ class Signup extends  Component {
 
 
   handleSubmit = (event) => {
-    console.log('handleSubmit');
     event.preventDefault();
-    this.setState({ isLoadingSignup: true });
-    Services.signup(this.state.email, this.state.password)
-      .subscribe(data => {
-        console.log('Signup success!');
-        this.setState({
-          isLoadingSignup: false ,
-          newUser: data.user
-        });
-      }, error => {
-        console.log('Signup failed error:', error);
-        this.setState({ isLoadingSignup: false });
-        alert(error)
-      });
-
+    this.props.onSignup(this.state.email, this.state.password);
   };
 
   handleConfirmationSubmit = (event) => {
-    console.log('handleConfirmationSubmit');
     event.preventDefault();
-    this.setState({ isLoadingSignup: true });
-    Services.confirmSignup(this.state.newUser, this.state.confirmationCode)
-      .subscribe(() => {
-        console.log('Confirm signup success!');
-        this.setState({ isLoadingSignup: false });
-      }, error => {
-        console.log('Confirm signup failed error:', error);
-        this.setState({ isLoadingSignup: false });
-        alert(error)
-      });
+    this.props.onConfirmSignup(this.state.confirmationCode, this.props.history);
   };
 
   validateForm() {
@@ -98,8 +72,8 @@ class Signup extends  Component {
         <div className="text-center">
           <button type="submit" className="btn btn-primary" disabled={!this.validateForm()}>
             {
-              this.state.isLoadingSignup
-                ? 'Sign up...'
+              this.props.isLoadingSignup
+                ? 'Signing up...'
                 : 'Signup'
             }
           </button>
@@ -116,7 +90,7 @@ class Signup extends  Component {
         <div className='text-center'>
           <button type='submit' className='btn btn-primary' disabled={!this.validateConfirmationForm() || this.state.isLoadingSignup }>
             {
-              this.state.isLoadingSignup
+              this.props.isLoadingSignup
                 ? 'Verifying'
                 : 'Verify'
             }
@@ -129,7 +103,7 @@ class Signup extends  Component {
         <h4>Signup</h4>
         <div className="signup">
           {
-            this.state.newUser === null
+            this.props.newUser === null
               ? signupForm
               : confirmSignupForm
           }

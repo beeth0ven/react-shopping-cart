@@ -21,35 +21,111 @@ class App extends Component {
 
   constructor(){
     super();
+
     this.state = {
       products: [],
-      ready: false
+      ready: false,
+      isLoadingSignup: false,
+      isLoadingSignin: false,
+      newUser: null,
+      userToken: null
     };
 
-    this.handelSelect = this.handelSelect.bind(this);
-    this.handleDeselect = this.handleDeselect.bind(this);
-    this.handleSave = this.handleSave.bind(this);
-    this.handleCheckout = this.handleCheckout.bind(this);
   }
 
-  handelSelect(product) {
+  handelSelect = (product) => {
     const products = this.state.products.slice();
     const index = products.map(i => i.id).indexOf(product.id);
     products[index].isSelected = product.isSelected;
     this.setState({products: products});
-  }
+  };
 
-  handleDeselect(product) {
+  handleDeselect = (product) => {
     this.handelSelect(product)
-  }
+  };
 
-  handleSave() {
+  handleSave = () => {
     console.log('App handleSave');
-  }
+  };
 
-  handleCheckout() {
+  handleCheckout = () => {
     console.log('App handleCheckout');
-  }
+  };
+
+  handleSignup = (email, password) => {
+    console.log('handleSignup');
+    this.setState({ isLoadingSignup: true });
+    Services.signup(email, password)
+      .subscribe(res => {
+        console.log('Signup success!');
+        this.setState({
+          isLoadingSignup: false ,
+          newUser: res.user
+        });
+      }, error => {
+        console.log('Signup failed error:', error);
+        this.setState({ isLoadingSignup: false });
+        alert(error)
+      });
+  };
+
+  handleConfirmSignup = (confirmationCode, history) => {
+    console.log('handleConfirmSignup');
+    this.setState({ isLoadingSignup: true });
+    Services.confirmSignup(this.state.newUser, confirmationCode)
+      .subscribe(() => {
+        console.log('Confirm signup success!');
+        this.setState({ isLoadingSignup: false });
+        history.push('/');
+      }, error => {
+        console.log('Confirm signup failed error:', error);
+        this.setState({ isLoadingSignup: false });
+        alert(error)
+      });
+  };
+
+  handleLogin = (email, password, history) => {
+    console.log('handleLogin');
+    this.setState({ isLoadingSignin: true });
+    Services.login(email, password)
+      .flatMap(token =>
+        Services.getProducts(token)
+          .map(result => ({
+            state: 'didGetProducts',
+            data: result.data
+          }))
+          .startWith({
+            state: 'didLogin',
+            data: token
+          })
+      )
+      .subscribe(result => {
+        switch (result.state) {
+          case 'didLogin':
+            console.log('Login success!', result);
+            this.setState({
+              isLoadingSignin: false,
+              userToken: result.data
+            });
+            history.push('/');
+            break;
+          case 'didGetProducts':
+            console.log('Get products success!', result);
+            this.setState({
+              products: result.data,
+              ready: true
+            });
+            break;
+          default:
+            console.log('Login default should not happen', result);
+            break;
+        }
+      }, error => {
+        console.log('Login failed error:', error);
+        this.setState({ isLoadingSignin: false });
+        alert(error);
+      })
+  };
 
   render() {
     return (
@@ -86,8 +162,22 @@ class App extends Component {
                           onCheckout={this.handleCheckout}
                         />
                       }/>
-                      <Route path="/signup" component={Signup}/>
-                      <Route path="/login" component={Login}/>
+                      <Route path="/signup" render={(props) =>
+                        <Signup
+                          {...props}
+                          isLoadingSignup={this.state.isLoadingSignup}
+                          newUser={this.state.newUser}
+                          onSignup={this.handleSignup}
+                          onConfirmSignup={this.handleConfirmSignup}
+                        />
+                      }/>
+                      <Route path="/login" render={(props) =>
+                        <Login
+                          {...props}
+                          isLoadingSignin={this.state.isLoadingSignin}
+                          onSignin={this.handleLogin}
+                        />
+                      }/>
                       <Route path="/error" component={Error}/>
                       <Route component={NoMatch}/>
                     </Switch>

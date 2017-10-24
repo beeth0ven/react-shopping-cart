@@ -10,12 +10,16 @@ const DB = DynamoDBService;
 
 class Product {
 
-  static get(callback) {
+  static get(userId, callback) {
     DB.allProducts()
       .subscribe(
         products => callback(null, Util.successResponse(products)),
         error => callback(Util.internalErrorResponse(error))
       )
+  }
+
+  static options(callback) {
+    callback(null, Util.optionsResponse());
   }
 }
 

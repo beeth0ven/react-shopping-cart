@@ -14,10 +14,19 @@ const ProductsHandler = require('../handler/productshandler');
 
 module.exports.handler = (event, context, callback) => {
 
+  let userId = null;
+  if (event.requestContext.authorizer) userId = event.requestContext.authorizer.claims.sub;
+
   try {
     switch (`${event.httpMethod} ${event.resource}`) {
       case 'GET /products':
-        Product.get(callback);
+        Product.get(null, callback);
+        break;
+      case 'GET /productsAuth':
+        Product.get(userId, callback);
+        break;
+      case 'OPTIONS /productsAuth':
+        Product.options(callback);
         break;
       case 'PUT /cart':
         Cart.put(event, callback);

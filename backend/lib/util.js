@@ -43,7 +43,9 @@ class Util {
       headers: {
         "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Methods":
-          "GET, POST, PUT, PATCH, DELETE, OPTIONS"
+          "GET, POST, PUT, PATCH, DELETE, OPTIONS",
+        "Access-Control-Allow-Headers":
+          "Accept, Authorization, Content-Type, Origin"
       }
     }
   };
