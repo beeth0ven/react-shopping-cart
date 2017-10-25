@@ -117,7 +117,7 @@ class Services {
 
   static currentUser() {
     const userPool = this.defaultCognitoUserPool();
-    return userPool.currentUser();
+    return userPool.getCurrentUser();
   }
 }
 

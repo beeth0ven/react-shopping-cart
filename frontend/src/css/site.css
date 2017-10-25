@@ -50,6 +50,38 @@
     width: 250px;
 }
 
+/* comment */
+
+.comment-list-title {
+    margin-bottom: 20px;
+}
+
+.comment-box {
+    width: 100%;
+    float: left;
+    margin-bottom: 40px;
+    background-color: #f5f5f5;
+    border-radius: 3px;
+    border: 1px solid #ddd;
+}
+
+.comment-box input {
+    width: 100%;
+    outline: none;
+    border-radius: 3px 3px 0 0;
+    border-color: #ddd;
+    border-width: 0 0 1px 0;
+}
+
+.comment-box button {
+    float: right;
+    margin: 3px 10px 2px 0;
+}
+
+.comment-box button > i {
+    margin-right: 7px;
+}
+
 /* shopping cart */
 
 .shopping-button {

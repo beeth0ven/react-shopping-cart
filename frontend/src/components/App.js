@@ -64,7 +64,7 @@ class App extends Component {
           newUser: res.user
         });
       }, error => {
-        console.log('Signup failed error:', error);
+        console.error('Signup failed error:', error);
         this.setState({ isLoadingSignup: false });
         alert(error)
       });
@@ -79,7 +79,7 @@ class App extends Component {
         this.setState({ isLoadingSignup: false });
         history.push('/');
       }, error => {
-        console.log('Confirm signup failed error:', error);
+        console.error('Confirm signup failed error:', error);
         this.setState({ isLoadingSignup: false });
         alert(error)
       });
@@ -96,6 +96,12 @@ class App extends Component {
       .startWith({ state: 'onStartLogin' })
       .catch(error => Observable.just({ state: 'onLoginError', data: error }))
       .subscribe(result => { this.onLoginResult(result, history) })
+  };
+
+  handleLogout = () => {
+    console.log('handleLogout');
+    Services.logout();
+    this.setState({ userToken: null });
   };
 
   onLoginResult = (result, history) => {
@@ -141,7 +147,7 @@ class App extends Component {
   };
 
   onLoginError = (error) => {
-    console.log('On Login Error:', error);
+    console.error('On Login Error:', error);
     this.setState({ isLoadingSignin: false });
     alert(error);
   };
@@ -152,7 +158,10 @@ class App extends Component {
         <div className="container">
           <div className="row">
             <div className="col-md-12">
-              <Header/>
+              <Header
+                isLogin ={!!this.state.userToken}
+                onLogout={this.handleLogout}
+              />
             </div>
           </div>
           <div className="row">

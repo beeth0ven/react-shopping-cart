@@ -11,6 +11,7 @@ const DB = DynamoDBService;
 class Product {
 
   static get(userId, callback) {
+    console.log('Product get userId:', userId);
     DB.allProducts()
       .subscribe(
         products => callback(null, Util.successResponse(products)),
