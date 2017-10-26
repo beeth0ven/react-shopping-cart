@@ -114,7 +114,6 @@ class Services {
             policyName: config.iot.POLICY_NAME,
             principal: AWS.config.credentials.identityId
           };
-
           const rxAttachPrincipalPolicy = Observable.fromNodeCallback(awsIoT.attachPrincipalPolicy.bind(awsIoT));
           return rxAttachPrincipalPolicy(params);
         } else {

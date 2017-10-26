@@ -263,13 +263,13 @@ class App extends Component {
     const rxUserToken = Services.userToken()
       .shareReplay(1);
 
-    const rxIotClient = rxUserToken
-      .flatMap((userToken) => Services.iotClient(userToken))
-      .shareReplay(1);
+    // const rxIotClient = rxUserToken
+    //   .flatMap((userToken) => Services.iotClient(userToken))
+    //   .shareReplay(1);
 
-    const rxIotClientMessage = rxIotClient
-      .flatMap((client) => client.messageSubject)
-      .shareReplay(1);
+    // const rxIotClientMessage = rxIotClient
+    //   .flatMap((client) => client.messageSubject)
+    //   .shareReplay(1);
 
     const rxProducts = rxUserToken
       .flatMap((userToken) => Services.products(userToken))
@@ -286,27 +286,27 @@ class App extends Component {
       }
     );
 
-    rxIotClient.subscribe(
-      (iotClient) => {
-        console.log('On Get IotClient');
-        this.setState({ iotClient: iotClient })
-      },
-      (error) => {
-        console.log('On Get IotClient Error', error);
-        alert(error)
-      }
-    );
+    // rxIotClient.subscribe(
+    //   (iotClient) => {
+    //     console.log('On Get IotClient');
+    //     this.setState({ iotClient: iotClient })
+    //   },
+    //   (error) => {
+    //     console.log('On Get IotClient Error', error);
+    //     alert(error)
+    //   }
+    // );
 
-    rxIotClientMessage.subscribe(
-      (messageObject) => {
-        console.log('On Get ClientMessage');
-        this.handleIotMessages(messageObject);
-      } ,
-      (error) => {
-        console.log('On Get ClientMessage Error', error);
-        alert(error)
-      }
-    );
+    // rxIotClientMessage.subscribe(
+    //   (messageObject) => {
+    //     console.log('On Get ClientMessage');
+    //     this.handleIotMessages(messageObject);
+    //   } ,
+    //   (error) => {
+    //     console.log('On Get ClientMessage Error', error);
+    //     alert(error)
+    //   }
+    // );
 
     rxProducts.subscribe(
       (result) =>  {
