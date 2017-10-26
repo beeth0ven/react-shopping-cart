@@ -6,7 +6,9 @@ import {
   Switch
 } from 'react-router-dom';
 import { Observable } from 'rx'
+import uuid from 'uuid/v4';
 
+import Header from "./Header";
 import Product from './Product';
 import ProductList from './ProductList';
 import ShoppingCart from './ShoppingCart';
@@ -16,7 +18,7 @@ import NoMatch from './NoMatch';
 import Error from './Error';
 
 import Services from '../lib/services';
-import Header from "./Header";
+import config from '../lib/config';
 
 class App extends Component {
 
@@ -29,7 +31,9 @@ class App extends Component {
       isLoadingSignup: false,
       isLoadingSignin: false,
       newUser: null,
-      userToken: null
+      userToken: null,
+      iotClient: null,
+      hasNotification: false
     };
 
   }
@@ -54,7 +58,7 @@ class App extends Component {
   };
 
   handleSignup = (email, password) => {
-    console.log('handleSignup');
+    console.log('App handleSignup');
     this.setState({ isLoadingSignup: true });
     Services.signup(email, password)
       .subscribe(res => {
@@ -71,7 +75,7 @@ class App extends Component {
   };
 
   handleConfirmSignup = (confirmationCode, history) => {
-    console.log('handleConfirmSignup');
+    console.log('App handleConfirmSignup');
     this.setState({ isLoadingSignup: true });
     Services.confirmSignup(this.state.newUser, confirmationCode)
       .subscribe(() => {
@@ -86,10 +90,10 @@ class App extends Component {
   };
 
   handleLogin = (email, password, history) => {
-    console.log('handleLogin');
+    console.log('App handleLogin');
     Services.login(email, password)
       .flatMap(token =>
-        Services.getProducts(token)
+        Services.products(token)
           .map(result => ({ state: 'onGetProducts', data: result.data }))
           .startWith({ state: 'onLogin', data: token })
       )
@@ -99,9 +103,39 @@ class App extends Component {
   };
 
   handleLogout = () => {
-    console.log('handleLogout');
+    console.log('App handleLogout');
     Services.logout();
     this.setState({ userToken: null });
+  };
+
+  handleComments = (comment, productId) => {
+    console.log('App handleComments');
+    const newComment = {
+      id: uuid(),
+      username: 'Luo Jie',
+      age: 'a fow seconds',
+      text: comment
+    };
+
+    Services.publishNewComment(this.state.iotClient, newComment, productId);
+  };
+
+  handleIotMessages = (messageObject) => {
+    console.log('App handleIotMessages');
+    if (messageObject.topic === config.iot.topics.COMMENTS) {
+      const msg = JSON.parse(messageObject.message.toString());
+      const product = this.state.products.find(product => product.id === msg.productId);
+      product.comments.unshift(msg.comment);
+
+      this.setState({ products: this.state.products });
+    } else {
+      this.setState({ hasNotification: true });
+    }
+  };
+
+  handleReadNotification = () => {
+    console.log('App handleReadNotification');
+    this.setState({ hasNotification: false });
   };
 
   onLoginResult = (result, history) => {
@@ -125,12 +159,12 @@ class App extends Component {
   };
 
   onStartLogin = () => {
-    console.log('On Start Login');
+    console.log('App On Start Login');
     this.setState({ isLoadingSignin: true });
   };
 
   onLogin = (userToken, history) => {
-    console.log('On Login');
+    console.log('App On Login');
     this.setState({
       isLoadingSignin: false,
       userToken: userToken
@@ -139,7 +173,7 @@ class App extends Component {
   };
 
   onGetProducts = (products) => {
-    console.log('On Get Products');
+    console.log('App On Get Products');
     this.setState({
       products: products,
       ready: true
@@ -147,7 +181,7 @@ class App extends Component {
   };
 
   onLoginError = (error) => {
-    console.error('On Login Error:', error);
+    console.error('App On Login Error:', error);
     this.setState({ isLoadingSignin: false });
     alert(error);
   };
@@ -161,6 +195,8 @@ class App extends Component {
               <Header
                 isLogin ={!!this.state.userToken}
                 onLogout={this.handleLogout}
+                hasNotification={this.state.hasNotification}
+                onReadNotification={this.handleReadNotification}
               />
             </div>
           </div>
@@ -180,6 +216,7 @@ class App extends Component {
                         <Product
                           product={this.state.products.find(x => x.id === props.match.params.id)}
                           onSelect={this.handelSelect}
+                          onComment={this.handleComments}
                         />
                       }/>
                       <Route path="/shopping-cart" render={() =>
@@ -223,13 +260,65 @@ class App extends Component {
 
   componentDidMount() {
 
-    Services.getProducts()
-      .subscribe(res => this.setState({
-          products: res.data,
-          ready: true
-        }),
-        error => console.error(error)
-      );
+    const rxUserToken = Services.userToken()
+      .shareReplay(1);
+
+    const rxIotClient = rxUserToken
+      .flatMap((userToken) => Services.iotClient(userToken))
+      .shareReplay(1);
+
+    const rxIotClientMessage = rxIotClient
+      .flatMap((client) => client.messageSubject)
+      .shareReplay(1);
+
+    const rxProducts = rxUserToken
+      .flatMap((userToken) => Services.products(userToken))
+      .shareReplay(1);
+
+    rxUserToken.subscribe(
+      (userToken) => {
+        console.log('On Get UserToken');
+        this.setState({ userToken: userToken })
+      },
+      (error) => {
+        console.log('On Get UserToken Error', error);
+        alert(error)
+      }
+    );
+
+    rxIotClient.subscribe(
+      (iotClient) => {
+        console.log('On Get IotClient');
+        this.setState({ iotClient: iotClient })
+      },
+      (error) => {
+        console.log('On Get IotClient Error', error);
+        alert(error)
+      }
+    );
+
+    rxIotClientMessage.subscribe(
+      (messageObject) => {
+        console.log('On Get ClientMessage');
+        this.handleIotMessages(messageObject);
+      } ,
+      (error) => {
+        console.log('On Get ClientMessage Error', error);
+        alert(error)
+      }
+    );
+
+    rxProducts.subscribe(
+      (result) =>  {
+        console.log('On Get Products');
+        this.setState({ products: result.data, ready: true });
+      },
+      (error) => {
+        console.log('On Get Products Error', error);
+        this.setState({ ready: true });
+        alert(error);
+      }
+    )
   }
 }
 

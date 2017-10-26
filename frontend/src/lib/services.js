@@ -4,6 +4,7 @@
 
 import AWS from 'aws-sdk';
 import axios from 'axios';
+import IoT from './iot';
 import config from './config';
 import { Observable } from 'rx';
 import {
@@ -15,7 +16,7 @@ import {
 
 class Services {
 
-  static getProducts(userToken) {
+  static products(userToken) {
     let url = `${config.apiGateway.ADDRESS}/${config.apiGateway.STAGE}/${config.services.PRODUCTS}`;
     if (userToken) url += 'Auth';
     return this.axiosRequest('get', url, null, userToken);
@@ -71,7 +72,7 @@ class Services {
     const currentUser = this.currentUser();
 
     if (!currentUser) {
-      return Observable.error(new Error('Current user is null'));
+      return Observable.throw(new Error('Current user is null'));
     }
 
     const rxGetSession = Observable.fromNodeCallback(currentUser.getSession.bind(currentUser));
@@ -85,6 +86,64 @@ class Services {
     if (currentUser !== null) currentUser.signOut();
     if (AWS.config.credentials) AWS.config.credentials.clearCachedId();
   };
+
+  static iotClient(userToken) {
+
+    AWS.config.region = config.cognito.REGION;
+
+    if (userToken) {
+      const authenticator = `cognito-idp.${config.cognito.REGION}.amazonaws.com/${config.cognito.USER_POOL_ID}`;
+      AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+        IdentityPoolId: config.cognito.IDENTITY_POOL_ID,
+        Logins: { [authenticator]: userToken }
+      })
+    } else  {
+      AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+        IdentityPoolId: config.cognito.IDENTITY_POOL_ID
+      })
+    }
+
+    const credentials = Observable.fromPromise(AWS.config.credentials.getPromise());
+
+    return credentials
+      .flatMapLatest(() => {
+        if (userToken) {
+          const awsIoT = new AWS.Iot();
+
+          const params = {
+            policyName: config.iot.POLICY_NAME,
+            principal: AWS.config.credentials.identityId
+          };
+
+          const rxAttachPrincipalPolicy = Observable.fromNodeCallback(awsIoT.attachPrincipalPolicy.bind(awsIoT));
+          return rxAttachPrincipalPolicy(params);
+        } else {
+          return Observable.just();
+        }
+      })
+      .map(() => {
+        const keys = {
+          accessKey: AWS.config.credentials.accessKeyId,
+          secretKey: AWS.config.credentials.secretAccessKey,
+          sessionToken: AWS.config.credentials.sessionToken
+        };
+        const client = new IoT(keys);
+        client.connect();
+        if (userToken) client.subscribe('serverless-store-' + AWS.config.credentials.identityId);
+        client.subscribe(config.iot.topics.COMMENTS);
+        return client;
+      });
+  }
+
+  static publishNewComment(iotClient, comment, productId) {
+    const topic = config.iot.topics.COMMENTS;
+    const message = {
+      comment: comment,
+      productId: productId
+    };
+
+    iotClient.push(topic, JSON.stringify(message));
+  }
 
   static axiosRequest(method, url, data, userToken) {
     const config = {

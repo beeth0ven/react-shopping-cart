@@ -1,11 +1,16 @@
 service: serverless-store
 
 custom:
+  awsAccountId: 778740201320
   cognitoAuthorizer: arn:aws:cognito-idp:ap-northeast-2:778740201320:userpool/ap-northeast-2_cu1JdcyH6
 
 provider:
   name: aws
   runtime: nodejs6.10
+  stage: dev
+  region: ap-northeast-2
+  memorySize: 128
+  timeout: 30
   iamRoleStatements:
     - Effect: "Allow"
       Action:
@@ -17,10 +22,12 @@ provider:
       Resource: [
         "arn:aws:dynamodb:ap-northeast-2:*:table/Product",
       ]
-  stage: dev
-  region: ap-northeast-2
-  memorySize: 128
-  timeout: 30
+    - Effect: "Allow"
+      Action:
+        - "iot:Publish"
+      Resource: [
+        "arn:aws:iot:${self:provider.region}:${self:custom.awsAccountId}:topic/serverless-store-*",
+      ]
 
 functions:
   products:

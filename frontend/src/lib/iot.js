@@ -1,14 +1,15 @@
 import awsIot from 'aws-iot-device-sdk';
 import config from './config';
+import { Subject } from 'rx';
 
 export default class IoT {
 
-  constructor(keys, observer) {
+  constructor(keys) {
     this.client = null;
     this.accessKey = keys.accessKey;
     this.secretKey = keys.secretKey;
     this.sessionToken = keys.sessionToken;
-    this.observer = observer;
+    this.messageSubject = new Subject();
   }
 
   connect = () => {
@@ -18,7 +19,7 @@ export default class IoT {
       accessKeyId: this.accessKey,
       secretKey: this.secretKey,
       sessionToken: this.sessionToken,
-      port: 433,
+      port: 443,
       protocol: 'wss'
     });
 
@@ -43,7 +44,7 @@ export default class IoT {
   };
 
   handleMessage = (topic, message) => {
-    this.observer.onNext(topic, message);
+    this.messageSubject.onNext({ topic, message });
   };
 
   handleClose = () => {

@@ -4,6 +4,7 @@
 
 import React, { Component } from 'react';
 import Comment from './Comment';
+import CommentBox from './CommentBox';
 
 class CommentList extends Component {
   render() {
@@ -19,7 +20,10 @@ class CommentList extends Component {
       <div>
         <h4>Custom Reviews</h4>
         {comments}
-        <h4>You need to be logged in to review this product</h4>
+        <CommentBox
+          productId={this.props.productId}
+          onComment={this.props.onComment}
+        />
       </div>
     );
   }
